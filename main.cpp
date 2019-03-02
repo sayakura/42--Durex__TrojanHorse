@@ -17,10 +17,7 @@ char	*getTime()
 }
 
 int main() {
-
-	openlog("mat_daemon" , 0 , LOG_USER);
-	syslog(LOG_INFO, "[%s] [ INFO ] - Matt_daemon: Started", getTime());
-	//printf("[%s] [ INFO ] - Matt_daemon: \n", getTime());
-	closelog();
+	FILE* logfile = fopen("var/log/matt_daemon/matt-daemon.log", "ab+");
+	fprintf(logfile, "[%s] [ INFO ] - Matt_daemon: Started", getTime());
 	return 0;
 }

@@ -18,7 +18,7 @@ char	*getTime()
 
 int main() {
 
-	// openlog(NULL, 0 , LOG_DAEMON);
+	openlog("mat_daemon" , 0 , LOG_USER);
 	syslog(LOG_INFO, "[%s] [ INFO ] - Matt_daemon: Started", getTime());
 	//printf("[%s] [ INFO ] - Matt_daemon: \n", getTime());
 	closelog();

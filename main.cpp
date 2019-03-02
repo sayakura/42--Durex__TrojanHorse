@@ -1,6 +1,7 @@
 #include <iostream>
 #include <syslog.h>
 #include <ctime>
+#include <sys/stat.h>
 using namespace std;
 
 char	*getTime()
@@ -17,7 +18,15 @@ char	*getTime()
 }
 
 int main() {
-	FILE* logfile = fopen("var/log/matt_daemon/matt-daemon.log", "ab+");
-	fprintf(logfile, "[%s] [ INFO ] - Matt_daemon: Started", getTime());
+	struct stat st;
+	if (stat("/var/log/matt_daemon", &st) == -1) {
+    		mkdir("/var/log/matt_daemon", 0777);
+	}   
+	FILE* logfile = fopen("/var/log/matt_daemon/matt-daemon.log", "ab+");
+	if (logfile)
+		fprintf(logfile, "[%s] [ INFO ] - Matt_daemon: Started\n", getTime());
+	else
+		printf("I dont know what to say\n");
+		
 	return 0;
 }

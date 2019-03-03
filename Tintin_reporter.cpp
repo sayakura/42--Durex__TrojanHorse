@@ -1,31 +1,37 @@
-#include "./Tintin_reporter.h"
+#include "Tintin_reporter.h"
 
-Tintin_reporter::Tintin_reporter(const char *logfile_path) {
-	struct stat st;
-
+FILE* 		logfile;
+void	Tintin_reporter::init(const char *logfile_path)
+{
 	_logfile_path = logfile_path;
 	logfile = fopen(logfile_path, "ab+");
+	setvbuf (logfile , NULL , _IONBF , 0);
 }
 
-void	Tintin_reporter::start(void){
+void	Tintin_reporter::start(void)
+{
 	if (logfile && _logfile_path)
 		fprintf(logfile, "[%s] [ INFO ] - Matt_daemon: Started.\n", this->getTime());
 }
 
-void	Tintin_reporter::info(const char *message){
+void	Tintin_reporter::info(const char *message)
+{
 	if (logfile && _logfile_path)
 		fprintf(logfile, "[%s] [ INFO ] - Matt_daemon: %s\n", this->getTime(), message);
 }
 
-void	Tintin_reporter::log(const char *message){
+void	Tintin_reporter::log(const char *message)
+{
 	if (logfile && _logfile_path)
 		fprintf(logfile, "[%s] [ INFO ] - Matt_daemon: %s\n", this->getTime(), message);
 }
 
-void	Tintin_reporter::error(const char *message){
+void	Tintin_reporter::error(const char *message)
+{
 	if (logfile && _logfile_path)
-		fprintf(logfile, "[%s] [ INFO ] - Matt_daemon: %s\n", this->getTime(), message);
+		fprintf(logfile, "[%s] [ ERROR ] - Matt_daemon: %s\n", this->getTime(), message);
 }
+
 
 char	*Tintin_reporter::getTime()
 {
@@ -41,5 +47,8 @@ char	*Tintin_reporter::getTime()
 
 void	Tintin_reporter::quit(){
 	if (logfile && _logfile_path)
+	{
 		fprintf(logfile, "[%s] [ INFO ] - Matt_daemon: Quitting.\n", this->getTime());
+		fclose(logfile);
+	}
 }

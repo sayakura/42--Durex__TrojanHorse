@@ -1,16 +1,8 @@
-[02/03/2019-05:25:52] [ INFO ] - Matt_daemon: Started
-[02/03/2019-05:45:10] [ INFO ] - Matt_daemon: Started
-[02/03/2019-05:57:04] [ INFO ] - Matt_daemon: Started
-[02/03/2019-05:57:04] [ INFO ] - Matt_daemon: quitting
-[02/03/2019-05:58:47] [ INFO ] - Matt_daemon: Started
-[02/03/2019-05:58:47] [ INFO ] - Matt_daemon: quitting
-[02/03/2019-05:58:58] [ INFO ] - Matt_daemon: Started
-[02/03/2019-05:58:58] [ INFO ] - Matt_daemon: quitting
-[02/03/2019-06:17:09] [ INFO ] - Matt_daemon: Started.
-[02/03/2019-06:17:09] [ INFO ] - Matt_daemon: Quitting.
-[02/03/2019-06:18:30] [ INFO ] - Matt_daemon: Started.
-[02/03/2019-06:18:30] [ INFO ] - Matt_daemon: Quitting.
-[02/03/2019-06:19:13] [ INFO ] - Matt_daemon: Started.
-[02/03/2019-06:19:13] [ INFO ] - Matt_daemon: Quitting.
-[02/03/2019-06:20:01] [ INFO ] - Matt_daemon: Started.
-[02/03/2019-06:20:01] [ INFO ] - Matt_daemon: Quitting.
+[03/03/2019-01:13:31] [ INFO ] - Matt_daemon: Started.
+[03/03/2019-01:13:31] [ INFO ] - Matt_daemon: Creating server.
+[03/03/2019-01:13:31] [ INFO ] - Matt_daemon: Server created.
+[03/03/2019-01:13:31] [ INFO ] - Matt_daemon: Entering Daemon mode.
+[03/03/2019-01:13:31] [ INFO ] - Matt_daemon: started. PID: 19019.
+[03/03/2019-01:23:56] [ INFO ] - Matt_daemon: client connected.
+[03/03/2019-01:24:55] [ INFO ] - Matt_daemon: Request quit.
+[03/03/2019-01:24:55] [ INFO ] - Matt_daemon: Quitting.

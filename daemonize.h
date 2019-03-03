@@ -11,8 +11,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
+#include "Tintin_reporter.h"
 
-void 	daemonize(Tintin_reporter *logger);
+void   daemonize(Tintin_reporter &logger);
 void	log_signal(int sig);
 void	unlock();
 #endif

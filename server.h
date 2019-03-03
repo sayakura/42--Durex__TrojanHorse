@@ -13,5 +13,4 @@
 # include <net/if.h>
 # include <stdlib.h>
 
-int		create_server(Tintin_reporter *logger);
 #endif

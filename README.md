@@ -1,5 +1,5 @@
 ### 42--matt-daemon__InternetServiceDaemon
-~Internet service daemon, listen on TCP connections and log all the info to var/log in the background.~
+*Internet service daemon, listen on TCP connections and log all the info to var/log in the background.*
 
 # Usage
 

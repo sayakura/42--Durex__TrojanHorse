@@ -1,8 +1,0 @@
-[03/03/2019-01:13:31] [ INFO ] - Matt_daemon: Started.
-[03/03/2019-01:13:31] [ INFO ] - Matt_daemon: Creating server.
-[03/03/2019-01:13:31] [ INFO ] - Matt_daemon: Server created.
-[03/03/2019-01:13:31] [ INFO ] - Matt_daemon: Entering Daemon mode.
-[03/03/2019-01:13:31] [ INFO ] - Matt_daemon: started. PID: 19019.
-[03/03/2019-01:23:56] [ INFO ] - Matt_daemon: client connected.
-[03/03/2019-01:24:55] [ INFO ] - Matt_daemon: Request quit.
-[03/03/2019-01:24:55] [ INFO ] - Matt_daemon: Quitting.

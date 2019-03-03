@@ -1,8 +1,9 @@
 
 #include "daemonize.h"
 #include "Tintin_reporter.h"
-#define lock_path "./var/lock/matt_daemon.lock"
 
+extern const char *lock_path;
+extern const  char *log_path;
 void daemonize(Tintin_reporter &logger)
 {
 	pid_t pid = 0;
@@ -38,7 +39,7 @@ void daemonize(Tintin_reporter &logger)
 	stdout = fopen("/dev/null", "w+");
 	stderr = fopen("/dev/null", "w+");
 
-	logger.init("./matt-daemon.log");
+	logger.init(log_path);
 	logger.start();
 	int pid_fd = open(lock_path, O_RDWR|O_CREAT, 0640);
 	if (pid_fd < 0) {

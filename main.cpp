@@ -3,6 +3,9 @@
 #include "Tintin_reporter.h"
 
 # define MAX_CLIENTS 3
+
+const char *lock_path;
+const char *log_path;
 int g_port = 4242;
 
 char	*strjoin(const char *s1, const char *s2)
@@ -155,7 +158,14 @@ int		create_server(Tintin_reporter &logger)
 	return master_sock;
 }
 
-int		main() {
+int		main(int ac, char **av) {
+	if (ac > 1) {
+		log_path = av[1];
+		lock_path = av[2];
+	} else {
+		log_path = "./Matt_Daemon.log";
+		lock_path = "./lock";
+	}
 
 	int master_sock;
 	char str[256];

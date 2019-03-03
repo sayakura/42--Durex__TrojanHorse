@@ -5,6 +5,19 @@
 # define MAX_CLIENTS 3
 int g_port = 4242;
 
+char	*strjoin(const char *s1, const char *s2)
+{
+	char* result;
+
+	result = (char *)malloc(strlen(s1) + strlen(s2) + 1);
+	if (result)
+	{
+		strcpy(result, s1);
+		strcat(result, s2);
+	}
+	return result;
+}
+
 int		socket_setup_ip6(void)
 {
 	int					main_sock;
@@ -28,19 +41,6 @@ int		socket_setup_ip6(void)
 	address.sin6_addr = in6addr_any;
 	bind(main_sock, (struct sockaddr *)&address, sizeof(address));
 	return (main_sock);
-}
-
-char	*strjoin(const char *s1, const char *s2)
-{
-	char* result;
-
-	result = (char *)malloc(strlen(s1) + strlen(s2) + 1);
-	if (result)
-	{
-		strcpy(result, s1);
-		strcat(result, s2);
-	}
-	return result;
 }
 
 void	handle_request(int *client_socks, fd_set *fd_list, Tintin_reporter &logger)

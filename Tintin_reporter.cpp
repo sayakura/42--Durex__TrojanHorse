@@ -32,7 +32,6 @@ void	Tintin_reporter::error(const char *message)
 		fprintf(logfile, "[%s] [ ERROR ] - Matt_daemon: %s\n", this->getTime(), message);
 }
 
-
 char	*Tintin_reporter::getTime()
 {
 	time_t		timer;

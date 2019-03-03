@@ -1,12 +1,15 @@
 
 #ifndef TINTIN_REPORTER
+
 # define TINTIN_REPORTER
-#include <iostream>
-#include <fstream>
-#include <syslog.h>
-#include <ctime>
-#include <sys/stat.h>
+# include <iostream>
+# include <fstream>
+# include <syslog.h>
+# include <ctime>
+# include <sys/stat.h>
+
 using namespace std;
+
 class Tintin_reporter
 {
 	private:

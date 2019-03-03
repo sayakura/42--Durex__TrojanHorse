@@ -1,6 +1,7 @@
 all:
-	g++ main.cpp Tintin_reporter.cpp daemonize.cpp
-
+	g++ main.cpp Tintin_reporter.cpp daemonize.cpp -o Matt_daemon
 clean:
-	rm ./var/lock/matt_daemon.lock
-	rm ./var/log/matt_daemon/matt-daemon.log
+	rm Matt_daemon
+fclean: re
+
+re:

@@ -5,6 +5,16 @@
 extern const char *lock_path;
 extern const  char *log_path;
 
+void	log_signal(int sig)
+{
+	Tintin_reporter logger;
+
+	logger.log(L_INFO, "Signal handler.");
+	logger.log(L_QUIT, NULL);
+	unlock();
+	exit(EXIT_SUCCESS);
+}
+
 void daemonize(Tintin_reporter &logger)
 {
 	pid_t pid = 0;
@@ -30,19 +40,12 @@ void daemonize(Tintin_reporter &logger)
 	stdin = fopen("/dev/null", "r");
 	stdout = fopen("/dev/null", "w+");
 	stderr = fopen("/dev/null", "w+");
+	signal(SIGINT, log_signal);
+	signal(SIGQUIT, log_signal);
+	signal(SIGTERM, log_signal);
 }
 
 void	unlock()
 {
 	unlink(lock_path);
-}
-
-void	log_signal(int sig)
-{
-	Tintin_reporter logger;
-
-	logger.log(L_INFO, "Signal handler");
-	logger.log(L_QUIT, NULL);
-	unlock();
-	exit(EXIT_SUCCESS);
 }

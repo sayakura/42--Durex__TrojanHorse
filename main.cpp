@@ -166,7 +166,8 @@ void	lock_checking(Tintin_reporter &logger)
 	}
 }
 
-int		main(int ac, char **av) {
+int		main(int ac, char **av)
+{
 	int				master_sock;
 	char			str[256];
 	Tintin_reporter	logger;
@@ -189,9 +190,6 @@ int		main(int ac, char **av) {
 	logger.log(L_INFO, "Entering Daemon mode.");
 	sprintf(str, "started. PID: %d.", getpid());
 	logger.log(L_INFO, str);
-	signal(SIGINT, log_signal);
-	signal(SIGQUIT, log_signal);
-	signal(SIGTERM, log_signal);
 	run_serser(master_sock, logger);
 	logger.log(L_QUIT, NULL);
 	return (0);

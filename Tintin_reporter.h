@@ -10,17 +10,30 @@
 
 using namespace std;
 
+enum LOG_TYPE
+{
+	L_START,
+	L_INFO,
+	L_ERROR,
+	L_LOG,
+	L_QUIT
+};
+
+const static char *type_labels[5] = {
+	NULL,
+	"INFO",
+	"ERROR",
+	"LOG",
+	NULL
+};
+
 class Tintin_reporter
 {
 	private:
 		const char	*_logfile_path;
 	public:
+		void 	log(LOG_TYPE, const char *);
 		void 	init(const char *);
-		void	start(void);
-		void 	log(const char*);
-		void 	info(const char*);
-		void 	error(const char*);
-		void	quit();
-		char	*getTime();
 };
+
 #endif

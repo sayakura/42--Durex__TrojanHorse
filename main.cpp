@@ -1,25 +1,13 @@
 #include "daemonize.h"
 #include "server.h"
 #include "Tintin_reporter.h"
+#include "utils.h"
 
 # define MAX_CLIENTS 3
 
 const char *lock_path;
 const char *log_path;
 int g_port = 4242;
-
-char	*strjoin(const char *s1, const char *s2)
-{
-	char* result;
-
-	result = (char *)malloc(strlen(s1) + strlen(s2) + 1);
-	if (result)
-	{
-		strcpy(result, s1);
-		strcat(result, s2);
-	}
-	return result;
-}
 
 int		socket_setup_ip6(void)
 {
@@ -78,14 +66,14 @@ void	handle_request(int *client_socks, fd_set *fd_list, Tintin_reporter &logger)
 				*(buf + offset) = '\0';
 				if (strcmp(buf, "quit") == 0)
 				{
-					logger.log("Request quit.");
-					logger.quit();
+					logger.log(L_INFO, "Request quit.");
+					logger.log(L_QUIT, NULL);
 					unlock();
 					exit(EXIT_SUCCESS);
 				}
 				ptr = strjoin("User input: ", buf);
 				free(ptr);
-				logger.log(ptr);
+				logger.log(L_LOG, ptr);
 			}
 			offset = 0;
 		}
@@ -102,7 +90,7 @@ void	handle_connection(int master_s, fd_set *fd_list, int *client_socks, Tintin_
 		if ((connected_s = accept(master_s,
 			(struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
 		{
-			logger.error("Accept failed.");
+			logger.log(L_ERROR, "Accept failed.");
 			exit(EXIT_FAILURE);
 		}
 		for (int i = 0; i < MAX_CLIENTS; i++)
@@ -137,7 +125,7 @@ void	run_serser(int master_sock, Tintin_reporter &logger)
 		}
 		if (select(max_sock + 1, &fd_list, NULL, NULL, NULL) < 0)
 		{
-			logger.error("Select failed.");
+			logger.log(L_ERROR, "Select failed.");
 			exit(EXIT_FAILURE);
 		}
 		handle_connection(master_sock, &fd_list, client_socks, logger);
@@ -152,13 +140,37 @@ int		create_server(Tintin_reporter &logger)
 	master_sock = socket_setup_ip6();
 	if (listen(master_sock, 3) < 0)
 	{
-		logger.error("Listen failed.");
+		logger.log(L_ERROR, "Listen failed.");
 		exit(EXIT_FAILURE);
 	}
-	return master_sock;
+	return (master_sock);
+}
+
+void	lock_checking(Tintin_reporter &logger)
+{
+	int		fd;
+
+
+	fd = open(lock_path, O_RDWR|O_CREAT, 0640);
+	if (fd < 0)
+	{
+		logger.log(L_ERROR, "Error can't create lockfile.");
+		logger.log(L_QUIT, NULL);
+		exit(EXIT_FAILURE);
+	}
+	if (lockf(fd, F_TLOCK, 0) < 0)
+	{
+		logger.log(L_ERROR, "Error file locked.");
+		logger.log(L_QUIT, NULL);
+		exit(EXIT_FAILURE);
+	}
 }
 
 int		main(int ac, char **av) {
+	int				master_sock;
+	char			str[256];
+	Tintin_reporter	logger;
+
 	if (ac > 1) {
 		log_path = av[1];
 		lock_path = av[2];
@@ -167,21 +179,20 @@ int		main(int ac, char **av) {
 		lock_path = "./lock";
 	}
 
-	int master_sock;
-	char str[256];
-	Tintin_reporter logger;
-
 	daemonize(logger);
-	logger.info("Creating server.");
+	logger.init(log_path);
+	logger.log(L_START, NULL);
+	lock_checking(logger);
+	logger.log(L_INFO, "Creating server.");
 	master_sock = create_server(logger);
-	logger.info("Server created.");
-	logger.info("Entering Daemon mode.");
+	logger.log(L_INFO, "Server created.");
+	logger.log(L_INFO, "Entering Daemon mode.");
 	sprintf(str, "started. PID: %d.", getpid());
-	logger.info(str);
+	logger.log(L_INFO, str);
 	signal(SIGINT, log_signal);
 	signal(SIGQUIT, log_signal);
 	signal(SIGTERM, log_signal);
 	run_serser(master_sock, logger);
-	logger.quit();
-	return 0;
+	logger.log(L_QUIT, NULL);
+	return (0);
 }

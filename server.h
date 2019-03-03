@@ -12,6 +12,5 @@
 # include <sys/stat.h>
 # include <sys/mman.h>
 # include <net/if.h>
-# include <stdlib.h>
 
 #endif

@@ -5,14 +5,19 @@
 
 ```sh
 $ make
+
 $ ./Matt_daemon
+
 $ ps aux | grep Matt_daemon
+
 $ netstat -an | grep 4242
+
 $ nc localhost 4242
 hello I am Kura
 this project is so easy
 did it in one day and still have some extra time to play arena and chill.
 quit
+
 $ cat [the_path_to_the_log_file]
 ```
 * it will just run in the background and listen to port 4242.

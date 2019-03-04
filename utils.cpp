@@ -1,6 +1,7 @@
 # include "utils.h"
 
-char	*getTime(void)
+char
+*getTime(void)
 {
 	time_t		timer;
 	static char	buffer[26];
@@ -12,9 +13,10 @@ char	*getTime(void)
 	return buffer;
 }
 
-char	*strjoin(const char *s1, const char *s2)
+char
+*strjoin(const char *s1, const char *s2)
 {
-	char* result;
+	char*		result;
 
 	result = (char *)malloc(strlen(s1) + strlen(s2) + 1);
 	if (result)

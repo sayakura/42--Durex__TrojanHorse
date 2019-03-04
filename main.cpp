@@ -1,15 +1,22 @@
 #include "daemonize.h"
 #include "server.h"
 #include "Tintin_reporter.h"
+#include "bonus.h"
 #include "utils.h"
+#include "Auth.h"
 
 # define MAX_CLIENTS 3
 
-const char *lock_path;
-const char *log_path;
-int g_port = 4242;
+# define __log logger.log
+# define __init logger.init
 
-int		socket_setup_ip6(void)
+const char	*g_lock_path;
+const char	*g_log_path;
+int 		g_port = 4242;
+Auth 		g_auth;
+
+int
+socket_setup_ip6(void)
 {
 	int					main_sock;
 	struct sockaddr_in6	address;
@@ -19,13 +26,13 @@ int		socket_setup_ip6(void)
 	if ((main_sock = socket(AF_INET6, SOCK_STREAM, 0)) == 0)
 	{
 		fprintf(stderr, "socket failed");
-		exit(EXIT_FAILURE);
+		::exit(EXIT_FAILURE);
 	}
 	if (setsockopt(main_sock, SOL_SOCKET, SO_REUSEADDR, (char *)&opt,\
 													sizeof(opt)) < 0)
 	{
 		fprintf(stderr, "setsocket failed");
-		exit(EXIT_FAILURE);
+		::exit(EXIT_FAILURE);
 	}
 	address.sin6_family = AF_INET6;
 	address.sin6_port = htons(g_port);
@@ -34,12 +41,53 @@ int		socket_setup_ip6(void)
 	return (main_sock);
 }
 
-void	handle_request(int *client_socks, fd_set *fd_list, Tintin_reporter &logger)
+void
+handle_request_helper(int sock, char *buf, Tintin_reporter &logger)
+{
+	char	*ptr;
+	int		status;
+
+	if (g_auth.is_enable() && !g_auth.is_logined(sock))
+	{
+		if (strncmp(buf, "login=", 6) == 0)
+			status = g_auth.logining(IS_LOGIN, buf + 6, sock, logger);
+		else if (strncmp(buf, "password=", 9) == 0)
+			status = g_auth.logining(IS_PASSWORD, buf + 9, sock, logger);
+		else
+		{
+			send(sock, "Not Authenticated.\n", 19, 0);
+			return ;
+		}
+		switch(status)
+		{
+			case LOGIN_FAILED:
+				send(sock, "Authentication failed.\n", 23, 0);
+				return ;
+			case LOGIN_WAIT:
+				return ;
+			case LOGIN_PASSED:
+				send(sock, "Authentication successed!\n", 26, 0);
+				return ;
+		}
+	}
+	if (strcmp(buf, "quit") == 0)
+	{
+		__log(L_INFO, "Request quit.");
+		__log(L_QUIT, NULL);
+		unlock();
+		::exit(EXIT_SUCCESS);
+	}
+	ptr = strjoin("User input: ", buf);
+	free(ptr);
+	__log(L_LOG, ptr);
+}
+
+void
+handle_request(int *client_socks, fd_set *fd_list, Tintin_reporter &logger)
 {
 	int		offset;
 	char	buf[1024];
 	int 	sock;
-	char 	*ptr;
 
 	for (int i = 0; i < MAX_CLIENTS; i++)
 		if (FD_ISSET(client_socks[i], fd_list))
@@ -51,6 +99,7 @@ void	handle_request(int *client_socks, fd_set *fd_list, Tintin_reporter &logger)
 			{
 				if (recv(sock, buf + offset, 1, 0) <= 0)
 				{
+					g_auth.loggout(client_socks[i]);
 					close(client_socks[i]);
 					client_socks[i] = 0;
 					break ;
@@ -64,22 +113,15 @@ void	handle_request(int *client_socks, fd_set *fd_list, Tintin_reporter &logger)
 			if (strlen(buf))
 			{
 				*(buf + offset) = '\0';
-				if (strcmp(buf, "quit") == 0)
-				{
-					logger.log(L_INFO, "Request quit.");
-					logger.log(L_QUIT, NULL);
-					unlock();
-					exit(EXIT_SUCCESS);
-				}
-				ptr = strjoin("User input: ", buf);
-				free(ptr);
-				logger.log(L_LOG, ptr);
+				handle_request_helper(sock, buf, logger);
 			}
 			offset = 0;
 		}
 }
 
-void	handle_connection(int master_s, fd_set *fd_list, int *client_socks, Tintin_reporter &logger)
+void
+handle_connection(int master_s, fd_set *fd_list, int *client_socks,
+												Tintin_reporter &logger)
 {
 	int					connected_s;
 	struct sockaddr_in6	address;
@@ -90,8 +132,8 @@ void	handle_connection(int master_s, fd_set *fd_list, int *client_socks, Tintin_
 		if ((connected_s = accept(master_s,
 			(struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
 		{
-			logger.log(L_ERROR, "Accept failed.");
-			exit(EXIT_FAILURE);
+			__log(L_ERROR, "Accept failed.");
+			::exit(EXIT_FAILURE);
 		}
 		for (int i = 0; i < MAX_CLIENTS; i++)
 			if (client_socks[i] == 0)
@@ -102,7 +144,8 @@ void	handle_connection(int master_s, fd_set *fd_list, int *client_socks, Tintin_
 	}
 }
 
-void	run_serser(int master_sock, Tintin_reporter &logger)
+void
+run_serser(int master_sock, Tintin_reporter &logger)
 {
 	fd_set	fd_list;
 	int		max_sock;
@@ -125,72 +168,69 @@ void	run_serser(int master_sock, Tintin_reporter &logger)
 		}
 		if (select(max_sock + 1, &fd_list, NULL, NULL, NULL) < 0)
 		{
-			logger.log(L_ERROR, "Select failed.");
-			exit(EXIT_FAILURE);
+			__log(L_ERROR, "Select failed.");
+			::exit(EXIT_FAILURE);
 		}
 		handle_connection(master_sock, &fd_list, client_socks, logger);
 		handle_request(client_socks, &fd_list, logger);
 	}
 }
 
-int		create_server(Tintin_reporter &logger)
+int
+create_server(Tintin_reporter &logger)
 {
 	int		master_sock;
 
 	master_sock = socket_setup_ip6();
 	if (listen(master_sock, 3) < 0)
 	{
-		logger.log(L_ERROR, "Listen failed.");
-		exit(EXIT_FAILURE);
+		__log(L_ERROR, "Listen failed.");
+		::exit(EXIT_FAILURE);
 	}
 	return (master_sock);
 }
 
-void	lock_checking(Tintin_reporter &logger)
+void
+lock_checking(Tintin_reporter &logger)
 {
 	int		fd;
 
-
-	fd = open(lock_path, O_RDWR|O_CREAT, 0640);
+	fd = open(g_lock_path, O_RDWR|O_CREAT, 0640);
 	if (fd < 0)
 	{
-		logger.log(L_ERROR, "Error can't create lockfile.");
-		logger.log(L_QUIT, NULL);
-		exit(EXIT_FAILURE);
+		__log(L_ERROR, "Error can't create lockfile.");
+		__log(L_QUIT, NULL);
+		::exit(EXIT_FAILURE);
 	}
 	if (lockf(fd, F_TLOCK, 0) < 0)
 	{
-		logger.log(L_ERROR, "Error file locked.");
-		logger.log(L_QUIT, NULL);
-		exit(EXIT_FAILURE);
+		__log(L_ERROR, "Error file locked.");
+		__log(L_QUIT, NULL);
+		::exit(EXIT_FAILURE);
 	}
 }
 
-int		main(int ac, char **av)
+int
+main(int ac, char **av)
 {
 	int				master_sock;
 	char			str[256];
 	Tintin_reporter	logger;
 
-	if (ac > 1) {
-		log_path = av[1];
-		lock_path = av[2];
-	} else {
-		log_path = "./Matt_Daemon.log";
-		lock_path = "./lock";
-	}
-
+	setup(ac, av);
+	g_log_path = "./Matt_Daemon.log"; // test only
+	g_lock_path = "./lock";  // test only
 	daemonize(logger);
-	logger.init(log_path);
-	logger.log(L_START, NULL);
+	__init(g_log_path);
+	__log(L_START, NULL);
 	lock_checking(logger);
-	logger.log(L_INFO, "Creating server.");
+	__log(L_INFO, "Creating server.");
 	master_sock = create_server(logger);
-	logger.log(L_INFO, "Server created.");
-	logger.log(L_INFO, "Entering Daemon mode.");
+	__log(L_INFO, "Server created.");
+	__log(L_INFO, "Entering Daemon mode.");
 	sprintf(str, "started. PID: %d.", getpid());
-	logger.log(L_INFO, str);
+	__log(L_INFO, str);
 	run_serser(master_sock, logger);
-	logger.log(L_QUIT, NULL);
+	__log(L_QUIT, NULL);
 	return (0);
 }

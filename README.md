@@ -24,6 +24,10 @@ Options:
   -h                         Print this menu.
   -p                         Path for the log file.
   -a                         Enable authentication, enter login and password seperated by ':'
+  
+
+$ ./Matt_daemon -a kura:123
+#this will start the daemon in secure mode, all the incomming connection will need to authenticate first.
 ```
 * it will just run in the background and listen to port 4242.
 * client can use nc commant to connect to it, it will just log whatever it receives to the log file.

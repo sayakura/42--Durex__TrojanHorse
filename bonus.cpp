@@ -67,6 +67,7 @@ setup(int ac, char **av)
 		printf("  -h                         Print this menu.\n");
 		printf("  -p                         Path for the log file.\n");
 		printf("  -a                         Enable authentication, enter login and password seperated by ':' \n");
+		exit(EXIT_SUCCESS);
 	}
 	g_log_path_setup(ac, av);
 	authentication_setup(ac, av);

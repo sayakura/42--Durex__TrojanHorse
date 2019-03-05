@@ -54,6 +54,8 @@ g_log_path_setup(int ac, char **av)
 		}
 	if (found && i + 1 < ac)
 		g_log_path = av[i + 1];
+	else
+		return ;
 	logfile = fopen(g_log_path, "ab+");
 	if (!logfile)
 	{

@@ -143,11 +143,11 @@ main(int ac, char **av)
 		printf("\x1b[31m» Need to specify the ip and the port.\n\x1b[0m");
 		exit(EXIT_FAILURE);
 	}
-	if (ac == 4)
+	if (ac > 3)
 		for (int i = 0; i < ac; i++)
 			if (strcmp(av[i], "-e") == 0)
 				encryption_mode = 1;
-	if (ac == 4)
+	if (ac > 3)
 		for (int i = 0; i < ac; i++)
 			if (strcmp(av[i], "-a") == 0)
 				authtication_mode = 1;

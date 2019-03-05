@@ -37,7 +37,7 @@ $ ./Matt_daemon -a kura:123
 - [ ] Create a graphical client to interact with the daemon.
 - [x] Add utility functions to your daemon (creating a remote shell by
 example!).
-- [ ] Encrypt the sending and receiving of data (involves a customer, logically).
+- [x] Encrypt the sending and receiving of data (involves a customer, logically).
 - [ ] Advanced archiving of logs.
 - [ ] Sending mail according to selected filtering rules.
 - [x] Create an authentication system to connect to the daemon (via graphical / remote client

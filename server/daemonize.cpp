@@ -2,8 +2,8 @@
 #include "daemonize.h"
 #include "Tintin_reporter.h"
 
-extern const char *g_lock_path;
-extern const  char *g_log_path;
+extern const char	*g_lock_path;
+extern const  char	*g_log_path;
 # define __log logger.log
 
 void

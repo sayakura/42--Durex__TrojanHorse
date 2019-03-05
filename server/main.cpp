@@ -4,6 +4,7 @@
 #include "bonus.h"
 #include "utils.h"
 #include "Auth.h"
+#include "encrypt.h"
 
 # define MAX_CLIENTS 3
 
@@ -13,6 +14,7 @@
 const char	*g_lock_path;
 const char	*g_log_path;
 int 		g_port = 4242;
+int 		encryption_mode;
 Auth 		g_auth;
 
 int
@@ -45,30 +47,40 @@ void
 handle_request_helper(int sock, char *buf, Tintin_reporter &logger)
 {
 	char	*ptr;
+	char	msg[50];
 	int		status;
 
+	if (encryption_mode == 1)
+		decrypt(buf, 0);
 	if (g_auth.is_enable() && !g_auth.is_logined(sock))
 	{
+		memset(msg, 0, 50);
 		if (strncmp(buf, "login=", 6) == 0)
 			status = g_auth.logining(IS_LOGIN, buf + 6, sock, logger);
 		else if (strncmp(buf, "password=", 9) == 0)
 			status = g_auth.logining(IS_PASSWORD, buf + 9, sock, logger);
 		else
 		{
-			send(sock, "Not Authenticated.\n", 19, 0);
-			return ;
+			strcpy(msg, "Not Authenticated.\n");
+			goto exit;
 		}
 		switch(status)
 		{
 			case LOGIN_FAILED:
-				send(sock, "Authentication failed.\n", 23, 0);
-				return ;
+				strcpy(msg, "Authentication failed.\n");
+				break ;
 			case LOGIN_WAIT:
-				return ;
+				strcpy(msg, "Waiting for the info to be completed.\n");
+				break ;
 			case LOGIN_PASSED:
-				send(sock, "Authentication successed!\n", 26, 0);
-				return ;
+				strcpy(msg, "Authentication successed!\n");
+				break ;
 		}
+		exit:
+			if (encryption_mode)
+				encrypt(msg);
+			send(sock, msg , 50, 0);
+			return ;
 	}
 	if (strcmp(buf, "quit") == 0)
 	{
@@ -78,7 +90,7 @@ handle_request_helper(int sock, char *buf, Tintin_reporter &logger)
 		::exit(EXIT_SUCCESS);
 	}
 	ptr = strjoin("User input: ", buf);
-	free(ptr);
+	::free(ptr);
 	__log(L_LOG, ptr);
 }
 
@@ -92,7 +104,7 @@ handle_request(int *client_socks, fd_set *fd_list, Tintin_reporter &logger)
 	for (int i = 0; i < MAX_CLIENTS; i++)
 		if (FD_ISSET(client_socks[i], fd_list))
 		{
-			bzero(buf, sizeof(buf));
+			memset(buf, 0, 1024);
 			sock = client_socks[i];
 			offset = 0;
 			for(;;)
@@ -218,8 +230,17 @@ main(int ac, char **av)
 	Tintin_reporter	logger;
 
 	setup(ac, av);
-	g_log_path = "./Matt_Daemon.log"; // test only
-	g_lock_path = "./lock";  // test only
+	if (!g_lock_path)
+	{
+		g_lock_path = "/var/log/matt_daemon/matt_daemon.log";
+		if (opendir("/var/log/matt_daemon") == NULL)
+			if (mkdir("/var/log/matt_daemon", 0777) < 0)
+			{
+				printf("No premission I guess.\n");
+				exit(EXIT_FAILURE);
+			}
+	}
+	g_lock_path = "/var/lock/matt_daemon.lock";
 	daemonize(logger);
 	__init(g_log_path);
 	__log(L_START, NULL);

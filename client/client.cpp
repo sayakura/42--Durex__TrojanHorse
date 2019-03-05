@@ -1,9 +1,11 @@
 
 #include "client.h"
+#include "../server/encrypt.h"
 
+bool encryption_mode = 0;
 
 int
-	ip_version(const char *src)
+ip_version(const char *src)
 {
 	char buf[16];
 
@@ -16,7 +18,7 @@ int
 
 
 char
-	get_char(void)
+get_char(void)
 {
 	char buff[1];
 
@@ -25,7 +27,7 @@ char
 }
 
 char
-	*get_input(void)
+*get_input(void)
 {
 	int			i;
 	static char	buf[101];
@@ -45,27 +47,45 @@ char
 }
 
 int
-	prompt(int sock)
+prompt(int sock)
 {
-	char	*buf;
-	int 	len;
+	char		*buf;
+	char		msg[50];
+	int 		len;
+	static int	is_authenticated;
+	int			will_quit;
 
+	will_quit = 0;
 	buf = get_input();
-	if ((strncmp(buf, "quit", 4)) == 0)
+	if((len = strlen(buf)))
 	{
-		send(sock, "quit", 4, 0);
-		close(sock);
-		return (0);
-	}
-	else if((len = strlen(buf)))
+		if ((strncmp(buf, "quit", 4)) == 0)
+			will_quit = 1;
+		if (encryption_mode == 1)
+			encrypt(buf);
 		send(sock, buf, len, 0);
+		if (!is_authenticated)
+		{
+			recv(sock, msg, 50, 0);
+				if (encryption_mode)
+			decrypt(msg, 1);
+			if (strcmp(msg, "Authentication successed!\n") == 0)
+				is_authenticated = 1;
+			printf("%s", msg);
+		}
+		if (will_quit)
+		{
+			close(sock);
+			exit(EXIT_SUCCESS);
+		}
+	}
 	else
 		printf("%s» Command not found: %s%s\n", RED, buf, RESET);
 	return (1);
 }
 
 int
-	socket_setup_6(char *host, int port)
+socket_setup_6(char *host, int port)
 {
 	int					s;
 	struct sockaddr_in6	addr;
@@ -84,7 +104,7 @@ int
 }
 
 void
-	socket_setup(char *host, int port)
+socket_setup(char *host, int port)
 {
 	int					sock;
 	struct sockaddr_in	servaddr;
@@ -115,13 +135,18 @@ void
 }
 
 int
-	main(int ac, char **av)
+main(int ac, char **av)
 {
-	if (ac != 3)
+	if (ac < 3)
 	{
 		printf("\x1b[31m» Need to specify the ip and the port.\n\x1b[0m");
 		exit(EXIT_FAILURE);
 	}
+	if (ac == 4)
+		for (int i = 0; i < ac; i++)
+			if (strcmp(av[i], "-e") == 0)
+				encryption_mode = 1;
+
 	printf("%s================================================\n", MAGENTA);
 	printf("|                                              |\n");
 	printf("|                  Ben_AFK                     |\n");

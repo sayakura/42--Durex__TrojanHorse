@@ -230,7 +230,7 @@ main(int ac, char **av)
 	Tintin_reporter	logger;
 
 	setup(ac, av);
-	if (!g_lock_path)
+	if (!g_log_path)
 	{
 		g_log_path = "/var/log/matt_daemon/matt_daemon.log";
 		if (opendir("/var/log/matt_daemon") == NULL)
@@ -241,10 +241,10 @@ main(int ac, char **av)
 			}
 	}
 	g_lock_path = "/var/lock/matt_daemon.lock";
-	daemonize(logger);
+	//daemonize(logger);
 	__init(g_log_path);
 	__log(L_START, NULL);
-	lock_checking(logger);
+	//lock_checking(logger);
 	__log(L_INFO, "Creating server.");
 	master_sock = create_server(logger);
 	__log(L_INFO, "Server created.");

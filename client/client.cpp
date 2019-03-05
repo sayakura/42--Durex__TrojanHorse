@@ -3,6 +3,7 @@
 #include "../server/encrypt.h"
 
 bool encryption_mode = 0;
+bool authtication_mode = 0;
 
 int
 ip_version(const char *src)
@@ -64,7 +65,7 @@ prompt(int sock)
 		if (encryption_mode == 1)
 			encrypt(buf);
 		send(sock, buf, len, 0);
-		if (!is_authenticated)
+		if (!is_authenticated && authtication_mode)
 		{
 			recv(sock, msg, 50, 0);
 				if (encryption_mode)
@@ -146,6 +147,10 @@ main(int ac, char **av)
 		for (int i = 0; i < ac; i++)
 			if (strcmp(av[i], "-e") == 0)
 				encryption_mode = 1;
+	if (ac == 4)
+		for (int i = 0; i < ac; i++)
+			if (strcmp(av[i], "-a") == 0)
+				authtication_mode = 1;
 
 	printf("%s================================================\n", MAGENTA);
 	printf("|                                              |\n");

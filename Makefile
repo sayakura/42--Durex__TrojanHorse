@@ -2,7 +2,7 @@ SERVERDIR = ./server
 all:
 	g++ $(SERVERDIR)/main.cpp $(SERVERDIR)/Tintin_reporter.cpp $(SERVERDIR)/daemonize.cpp $(SERVERDIR)/utils.cpp $(SERVERDIR)/bonus.cpp $(SERVERDIR)/Auth.cpp  $(SERVERDIR)/encrypt.cpp -o Matt_daemon
 clean:
-	rm Matt_daemoin Ben_AFK
+	rm Matt_daemon Ben_AFK
 fclean: clean
 
 client:

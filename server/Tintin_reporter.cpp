@@ -9,6 +9,7 @@ void	Tintin_reporter::init(const char *logfile_path)
 	logfile = fopen(logfile_path, "ab+");
 	if (!logfile)
 	{
+		fprintf(stderr, "%s\n", logfile_path);
 		fprintf(stderr, "Can't open log file.\n");
 		exit(EXIT_FAILURE);
 	}

@@ -82,7 +82,7 @@ handle_request_helper(int sock, char *buf, Tintin_reporter &logger)
 			send(sock, msg , 50, 0);
 			return ;
 	}
-	if (strcmp(buf, "quit") == 0)
+	if (strcmp(buf, "quit") == 0 || strcmp(buf, "quit\n") == 0)
 	{
 		__log(L_INFO, "Request quit.");
 		__log(L_QUIT, NULL);
@@ -90,8 +90,8 @@ handle_request_helper(int sock, char *buf, Tintin_reporter &logger)
 		::exit(EXIT_SUCCESS);
 	}
 	ptr = strjoin("User input: ", buf);
-	::free(ptr);
 	__log(L_LOG, ptr);
+	::free(ptr);
 }
 
 void
@@ -232,7 +232,7 @@ main(int ac, char **av)
 	setup(ac, av);
 	if (!g_lock_path)
 	{
-		g_lock_path = "/var/log/matt_daemon/matt_daemon.log";
+		g_log_path = "/var/log/matt_daemon/matt_daemon.log";
 		if (opendir("/var/log/matt_daemon") == NULL)
 			if (mkdir("/var/log/matt_daemon", 0777) < 0)
 			{

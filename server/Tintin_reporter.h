@@ -2,6 +2,7 @@
 #ifndef TINTIN_REPORTER
 
 # define TINTIN_REPORTER
+
 # include <iostream>
 # include <fstream>
 # include <syslog.h>

@@ -1,45 +1,34 @@
 #include "Auth.h"
 
-Auth::Auth(char* login, char *pw, bool enable)
-	: auth_login(encrypt(login)), auth_pw(encrypt(pw)), auth_enabled(enable)
+Auth::Auth(char* keycode, bool enable)
+	: keycode(encrypt(keycode)), auth_enabled(enable)
 	{
 		bzero(this->session_table, sizeof(this->session_table));
 	};
 
 LOGIN_STATUS
-Auth::logining(int type, char *str, int i, Tintin_reporter &logger)
+Auth::logining(char *str, int i, Tintin_reporter &logger)
 {
 	if (!this->auth_enabled)
 		return (LOGIN_NOT_ENABLED);
 	if (this->session_table[i] == NULL)
 	{
 		this->session_table[i] = (t_session *)malloc(sizeof(t_session));
-		this->session_table[i]->login = NULL;
-		this->session_table[i]->pw = NULL;
+		this->session_table[i]->keycode = NULL;
 		this->session_table[i]->is_login = false;
 	}
-	if (type == IS_LOGIN)
-		this->session_table[i]->login = encrypt(str);
-	else if (type == IS_PASSWORD)
-		this->session_table[i]->pw = encrypt(str);
-	if (this->session_table[i]->login != NULL &&
-		this->session_table[i]->pw != NULL)
+	this->session_table[i]->keycode = encrypt(str);
+	if (strcmp(this->keycode, this->session_table[i]->keycode) == 0)
 	{
-		if ((strcmp(this->auth_login, this->session_table[i]->login) == 0)
-			&& (strcmp(this->auth_pw, this->session_table[i]->pw) == 0))
-		{
-			this->session_table[i]->is_login = true;
-			return (LOGIN_PASSED);
-		}
-		else
-		{
-			free(this->session_table[i]);
-			this->session_table[i] = NULL;
-			return (LOGIN_FAILED);
-		}
+		this->session_table[i]->is_login = true;
+		return (LOGIN_PASSED);
 	}
 	else
-		return (LOGIN_WAIT);
+	{
+		free(this->session_table[i]);
+		this->session_table[i] = NULL;
+		return (LOGIN_FAILED);
+	}
 }
 
 bool
@@ -59,8 +48,7 @@ Auth::loggout(int i)
 		return ;
 	if (this->session_table[i] == 0)
 		return ;
-	free(this->session_table[i]->login);
-	free(this->session_table[i]->pw);
+	free(this->session_table[i]->keycode);
 	free(this->session_table[i]);
 	this->session_table[i] = 0;
 }

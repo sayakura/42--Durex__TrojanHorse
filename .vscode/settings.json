@@ -12,6 +12,9 @@
 		"typeinfo": "cpp",
 		"algorithm": "cpp",
 		"iosfwd": "cpp",
-		"functional": "cpp"
+		"functional": "cpp",
+		"stdlib.h": "c",
+		"xattr.h": "c",
+		"mman.h": "c"
 	}
 }

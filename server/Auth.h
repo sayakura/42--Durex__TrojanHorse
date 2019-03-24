@@ -12,13 +12,12 @@
 
 typedef struct	s_session
 {
-	char 	*login, *pw;
+	char 	*keycode;
 	bool	is_login;
 }				t_session;
 
 enum	LOGIN_STATUS
 {
-	LOGIN_WAIT,
 	LOGIN_FAILED,
 	LOGIN_PASSED,
 	LOGIN_NOT_ENABLED
@@ -27,18 +26,17 @@ enum	LOGIN_STATUS
 class Auth
 {
 	private:
-		char			*auth_login;
-		char			*auth_pw;
+		char			*keycode;
 		t_session		*session_table[SESSION_TABLE_SIZE];
 		bool			auth_enabled;
 	public:
 		Auth(void) { this->auth_enabled = false; };
-		Auth(char*, char *, bool);
-		LOGIN_STATUS	logining(int, char *, int, Tintin_reporter &);
+		Auth(char*, bool);
+		LOGIN_STATUS	logining(char *, int, Tintin_reporter &);
 		void			loggout(int);
 		bool			is_logined(int);
 		static char		*encrypt(char *);
-		bool			login(char*, char *, int);
+		bool			login(char*, int);
 		bool			is_enable(void);
 };
 #endif

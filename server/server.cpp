@@ -55,10 +55,8 @@ handle_request_helper(int sock, char *buf, Tintin_reporter &logger)
 	if (g_auth.is_enable() && !g_auth.is_logined(sock))
 	{
 		memset(msg, 0, 50);
-		if (strncmp(buf, "login=", 6) == 0)
-			status = g_auth.logining(IS_LOGIN, buf + 6, sock, logger);
-		else if (strncmp(buf, "password=", 9) == 0)
-			status = g_auth.logining(IS_PASSWORD, buf + 9, sock, logger);
+		if (strncmp(buf, "4242", 6) == 0)
+			status = g_auth.logining( buf + 6, sock, logger); 
 		else
 		{
 			strcpy(msg, "Not Authenticated.\n");
@@ -68,9 +66,6 @@ handle_request_helper(int sock, char *buf, Tintin_reporter &logger)
 		{
 			case LOGIN_FAILED:
 				strcpy(msg, "Authentication failed.\n");
-				break ;
-			case LOGIN_WAIT:
-				strcpy(msg, "Waiting for the info to be completed.\n");
 				break ;
 			case LOGIN_PASSED:
 				strcpy(msg, "Authentication successed!\n");
@@ -223,7 +218,7 @@ lock_checking(Tintin_reporter &logger)
 }
 
 int
-main(int ac, char **av)
+deamon(int ac, const char **av)
 {
 	int				master_sock;
 	char			str[256];
@@ -232,15 +227,15 @@ main(int ac, char **av)
 	setup(ac, av);
 	if (!g_log_path)
 	{
-		g_log_path = "/var/log/matt_daemon/matt_daemon.log";
-		if (opendir("/var/log/matt_daemon") == NULL)
-			if (mkdir("/var/log/matt_daemon", 0777) < 0)
+		g_log_path = "/var/log/durex/durex.log";
+		if (opendir("/var/log/durex") == NULL)
+			if (mkdir("/var/log/durex", 0777) < 0)
 			{
 				printf("No premission I guess.\n");
 				exit(EXIT_FAILURE);
 			}
 	}
-	g_lock_path = "/var/lock/matt_daemon.lock";
+	g_lock_path = "/var/lock/durex.lock";
 	daemonize(logger);
 	__init(g_log_path);
 	__log(L_START, NULL);

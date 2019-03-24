@@ -5,11 +5,10 @@ extern const char	*g_log_path;
 extern int			encryption_mode;
 void
 
-authentication_setup(int ac, char **av)
+authentication_setup(int ac, const char **av)
 {
 	int		i;
-	char	*login_and_pw[2];
-	char	*token;
+	char	*keycode;
 
 	if (ac < 2)
 		return ;
@@ -19,25 +18,13 @@ authentication_setup(int ac, char **av)
 			break ;
 	if (i >= ac - 1)
 		return ;
-	token = strtok(av[i + 1], ":");
-	i = 0;
-	while (token != NULL)
-	{
-		login_and_pw[i++] = strdup(token);
-		token = strtok(NULL, ":");
-	}
-	if (login_and_pw[0] == NULL || login_and_pw[1] == NULL)
-	{
-		fprintf(stderr, "Invalid parameter format.\n");
-		::exit(EXIT_FAILURE);
-	}
-	g_auth = Auth(login_and_pw[0], login_and_pw[1], true);
-	free(login_and_pw[0]);
-	free(login_and_pw[1]);
+	keycode = strdup(av[i + 1]); 
+	g_auth = Auth(keycode, true);
+	free(keycode);
 }
 
 void
-g_log_path_setup(int ac, char **av)
+g_log_path_setup(int ac, const char **av)
 {
 	int		i;
 	int		found;
@@ -66,21 +53,21 @@ g_log_path_setup(int ac, char **av)
 }
 
 void
-setup(int ac, char **av)
+setup(int ac, const char **av)
 {
 	int i;
 
-	for (i = 1; i < ac; i++)
-		if (strcmp("-h", av[i]) == 0)
-		{
-			printf("Usage: make [options] [parameters] ...\n");
-			printf("Options:\n");
-			printf("  -h                         Print this menu.\n");
-			printf("  -p                         Path for the log file.\n");
-			printf("  -a                         Enable authentication, enter login and password seperated by ':' \n");
-			printf("  -e                         Enable encryption mode. \n");
-			exit(EXIT_SUCCESS);
-		}
+	// for (i = 1; i < ac; i++)
+	// 	if (strcmp("-h", av[i]) == 0)
+	// 	{
+	// 		printf("Usage: make [options] [parameters] ...\n");
+	// 		printf("Options:\n");
+	// 		printf("  -h                         Print this menu.\n");
+	// 		printf("  -p                         Path for the log file.\n");
+	// 		printf("  -a                         Enable authentication, enter login and password seperated by ':' \n");
+	// 		printf("  -e                         Enable encryption mode. \n");
+	// 		exit(EXIT_SUCCESS);
+	// 	}
 	for (int i = 0; i < ac; i++)
 		if (strcmp(av[i], "-e") == 0)
 			encryption_mode = 1;

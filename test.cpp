@@ -1,8 +1,13 @@
 #include <sys/xattr.h>
 #include <stdio.h>
+# include <unistd.h>
+
+     #include <fcntl.h>
 int	main(int ac, char **av)
 {
-	setxattr(__FILE__, "virtus", "yes", 3, 0);
-	perror("set");
+	int fd = open(av[0], O_RDONLY);
+	char buff[100];
+	read(fd, buff, 100);
+	puts(buff);
 	return (0);
 }

@@ -9,8 +9,7 @@ void	decrypt(char *msg, int client)
 		msg[i] -= 42;
 }
 
-void
-encrypt(char *msg)
+void	encrypt(char *msg)
 {
 	int len;
 

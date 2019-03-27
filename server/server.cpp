@@ -49,19 +49,14 @@ handle_request_helper(int sock, char *buf, Tintin_reporter &logger)
 	char	*ptr;
 	char	msg[50];
 	int		status;
+	int		ret;
 
 	if (encryption_mode == 1)
 		decrypt(buf, 0);
 	if (g_auth.is_enable() && !g_auth.is_logined(sock))
 	{
 		memset(msg, 0, 50);
-		if (strncmp(buf, "4242", 6) == 0)
-			status = g_auth.logining( buf + 6, sock, logger); 
-		else
-		{
-			strcpy(msg, "Not Authenticated.\n");
-			goto exit;
-		}
+		status = g_auth.logining(buf, sock, logger);
 		switch(status)
 		{
 			case LOGIN_FAILED:
@@ -71,11 +66,10 @@ handle_request_helper(int sock, char *buf, Tintin_reporter &logger)
 				strcpy(msg, "Authentication successed!\n");
 				break ;
 		}
-		exit:
-			if (encryption_mode)
-				encrypt(msg);
-			send(sock, msg , 50, 0);
-			return ;
+		if (encryption_mode)
+			encrypt(msg);
+		send(sock, msg , 50, 0);
+		return ;
 	}
 	if (strncmp(buf, "quit", 4) == 0)
 	{
@@ -232,7 +226,7 @@ deamon(int ac, const char **av)
 			if (mkdir("/var/log/durex", 0777) < 0)
 			{
 				printf("No premission I guess.\n");
-				exit(EXIT_FAILURE);
+				::exit(EXIT_FAILURE);
 			}
 	}
 	g_lock_path = "/var/lock/durex.lock";
@@ -244,7 +238,7 @@ deamon(int ac, const char **av)
 	master_sock = create_server(logger);
 	__log(L_INFO, "Server created.");
 	__log(L_INFO, "Entering Daemon mode.");
-	sprintf(str, "started. PID: %d.", getpid());
+	::sprintf(str, "started. PID: %d.", getpid());
 	__log(L_INFO, str);
 	run_serser(master_sock, logger);
 	__log(L_QUIT, NULL);

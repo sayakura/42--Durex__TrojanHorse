@@ -218,6 +218,7 @@ deamon(int ac, const char **av)
 	char			str[256];
 	Tintin_reporter	logger;
 
+	printf("setup\n");
 	setup(ac, av);
 	if (!g_log_path)
 	{
@@ -230,6 +231,7 @@ deamon(int ac, const char **av)
 			}
 	}
 	g_lock_path = "/var/lock/durex.lock";
+	printf("daemonize\n");
 	daemonize(logger);
 	__init(g_log_path);
 	__log(L_START, NULL);

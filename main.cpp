@@ -33,7 +33,7 @@ void     init(const char *name)
     this_file = open(name, O_RDONLY);
     if (virtus == -1 || this_file == -1)
     {
-        perror("openq");
+        perror("open");
         exit(EXIT_FAILURE);
     }
     fstat(this_file, &sb);

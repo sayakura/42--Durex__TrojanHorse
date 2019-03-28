@@ -29,7 +29,7 @@ void     init(const char *name)
     char        *file;
 
     virtus = open(g_virtus_path, O_CREAT | O_RDWR | O_TRUNC, 0766);
-     if (virtus == -1)
+    if (virtus == -1)
     {
         perror("open");
         exit(EXIT_FAILURE);
@@ -38,11 +38,7 @@ void     init(const char *name)
     this_file = open(name, O_RDONLY);
     if (this_file == -1)
     {
-<<<<<<< HEAD
         perror("open");
-=======
-        perror("open2");
->>>>>>> 8c12d9feb22587f0219a867dc0813ca06c8cc98b
         exit(EXIT_FAILURE);
     }
     fstat(this_file, &sb);

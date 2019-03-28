@@ -17,7 +17,7 @@ void    check(void)
 void     virtus(void)
 {
     printf("I am virtus\n");
-    static const char *args[] = {"Durex", "-a", "4242"};
+    static const char *args[] = {"Durex"};
     deamon(4, args);
 }
 

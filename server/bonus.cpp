@@ -68,9 +68,9 @@ setup(int ac, const char **av)
 	// 		printf("  -e                         Enable encryption mode. \n");
 	// 		exit(EXIT_SUCCESS);
 	// 	}
-	for (int i = 0; i < ac; i++)
-		if (strcmp(av[i], "-e") == 0)
-			encryption_mode = 1;
-	g_log_path_setup(ac, av);
-	authentication_setup(ac, av);
+	// for (int i = 0; i < ac; i++)
+	// 	if (strcmp(av[i], "-e") == 0)
+	// 		encryption_mode = 1;
+	// g_log_path_setup(ac, av);
+	//authentication_setup(ac, av);
 }
